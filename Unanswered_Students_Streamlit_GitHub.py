@@ -14,9 +14,18 @@ import streamlit as st
 import streamlit.components.v1 as stc 
 
 
+@st.cache_data(ttl=3600, show_spinner="正在加載資料...")  ## Add the caching decorator
+def load_data(path):
+    df = pd.read_pickle(path)
+    return df
+
+
+
+
 ####### 查詢沒有填問卷之各系名單
-###### 讀入 "實際填答名單資料" 外部excel 檔
-df_total = pd.read_excel(r'C:\Users\user\Dropbox\系務\校務研究IR\大一新生學習適應調查分析\112\final\df_freshman_original.xlsx', sheet_name=0)
+###### 讀入 "實際填答名單資料" 外部檔
+df_total = load_data('df_freshman_original.pkl')
+# df_total = pd.read_excel('df_freshman_original.xlsx', sheet_name=0)
 # df_total.shape  ## (1674, 186)
 # df_total.columns
 # '''
@@ -28,8 +37,9 @@ df_total = pd.read_excel(r'C:\Users\user\Dropbox\系務\校務研究IR\大一新
 #        'name', '密碼', '學系', '學院'],
 #       dtype='object', length=186)
 # '''
-###### 讀入 "應填答名單資料" 外部 excel 檔
-df_ID = pd.read_excel(r'C:\Users\user\Dropbox\系務\校務研究IR\大一新生學習適應調查分析\112\final\df_ID.xlsx', sheet_name=0)
+###### 讀入 "應填答名單資料" 外部檔
+df_ID = load_data('df_ID.pkl')
+# df_ID = pd.read_excel('df_ID.xlsx', sheet_name=0)
 # df_ID.shape  ## (2002, 7)
 # df_ID.columns
 # '''
@@ -40,8 +50,28 @@ df_ID = pd.read_excel(r'C:\Users\user\Dropbox\系務\校務研究IR\大一新生
 not_in_df_total = ~df_ID['stno'].isin(df_total['stno'])
 ###### 篩選出未填問卷名單
 df_ID_未填問卷 = df_ID[not_in_df_total]
-df_ID_未填問卷.shape  ## (293, 7)
-##### 輸出成外部 excel 檔
-df_ID_未填問卷.to_excel(r'C:\Users\user\Dropbox\系務\校務研究IR\大一新生學習適應調查分析\112\final\未填問卷名單.xlsx',index=False)
+# df_ID_未填問卷.shape  ## (293, 7)
+# ##### 輸出成外部 excel 檔
+# df_ID_未填問卷.to_excel('未填問卷名單.xlsx',index=False)
 
+
+####### 設定呈現標題 
+html_temp = """
+		<div style="background-color:#3872fb;padding:10px;border-radius:10px">
+		<h1 style="color:white;text-align:center;"> 查詢未填問卷名單 </h1>
+		</div>
+		"""
+stc.html(html_temp)
+
+
+
+choice = st.selectbox('選擇系級', df_ID_未填問卷['系級'].unique())
+#choice = '化科系'
+df_ID_未填問卷_department = df_ID_未填問卷[df_ID_未填問卷['系級']==choice]
+
+
+##### 使用Streamlit展示DataFrame "df_ID_未填問卷_department"，但不显示索引
+# st.write(item_name, result_df.to_html(index=False), unsafe_allow_html=True)
+st.write(df_ID_未填問卷_department.to_html(index=False), unsafe_allow_html=True)
+st.markdown("##")  ## 更大的间隔
 
