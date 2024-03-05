@@ -83,7 +83,7 @@ df_ID_未填問卷 = df_ID[not_in_df_total]
 ####### 設定呈現標題 
 html_temp = """
 		<div style="background-color:#3872fb;padding:10px;border-radius:10px">
-		<h1 style="color:white;text-align:center;"> 112學年度大三學習經驗問卷調查 - 未填問卷名單 </h1>
+		<h1 style="color:white;text-align:center;"> 112大三學習經驗問卷調查 - 未填問卷名單 </h1>
 		</div>
 		"""
 stc.html(html_temp)
